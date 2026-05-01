@@ -2,10 +2,8 @@
 
 ## AI Tools Used
 
-- **GitHub Copilot** was used throughout: it provided completions for boilerplate (EF model
-  configuration, Serilog bootstrap, xUnit test stubs) and suggested the `PRAGMA foreign_key_list`
-  approach for FK introspection.
-- I reviewed, understood, and own every decision described below. The follow-up interview should
+- **GitHub Copilot** was used to generate seed data (project root/data directory) and .gitignore file. Also it is used to generate meaningful comments and boilerplate codebase.
+- I own every decision described below. The follow-up interview should
   feel comfortable — I can speak to all of it.
 
 ---

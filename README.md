@@ -1,19 +1,5 @@
 # Multi-Tenant Dynamic Data API
 
-A take-home coding challenge submission. ASP.NET Core 8 Web API that lets a single endpoint serve
-dynamic data from any table in any tenant's database — with no code changes required to switch tenants.
-
----
-
-## Prerequisites
-
-| Tool | Version |
-|---|---|
-| [.NET SDK](https://dotnet.microsoft.com/download) | 8.0+ |
-| No database server required | SQLite is bundled |
-
----
-
 ## How to Run
 
 ```bash
@@ -103,18 +89,6 @@ curl -OJ "http://localhost:5000/acme/data/Products/export/csv"
 # Download Excel
 curl -OJ "http://localhost:5000/acme/data/Products/export/excel"
 ```
-
----
-
-## Seeded Sample Data
-
-On first run (Development environment) the seeder creates:
-
-| File | Tenant ID | Tables |
-|---|---|---|
-| `data/tenant_acme.db` | `acme` | `Products` (20 rows), `Categories` (5 rows) |
-| `data/tenant_globex.db` | `globex` | `Inventory` (20 rows), `Warehouses` (4 rows) |
-| `data/metadata.db` | — | Tenant registry + column mappings |
 
 ---
 
