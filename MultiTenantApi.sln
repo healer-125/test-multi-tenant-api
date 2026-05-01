@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenantApi", "MultiTenantApi\MultiTenantApi.csproj", "{ED86A552-A058-470F-9E2B-70766D812979}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiTenantApi.Tests", "MultiTenantApi.Tests\MultiTenantApi.Tests.csproj", "{6D906B37-DA5C-4420-9A89-C5CF26848795}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED86A552-A058-470F-9E2B-70766D812979}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED86A552-A058-470F-9E2B-70766D812979}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED86A552-A058-470F-9E2B-70766D812979}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED86A552-A058-470F-9E2B-70766D812979}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D906B37-DA5C-4420-9A89-C5CF26848795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D906B37-DA5C-4420-9A89-C5CF26848795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D906B37-DA5C-4420-9A89-C5CF26848795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D906B37-DA5C-4420-9A89-C5CF26848795}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

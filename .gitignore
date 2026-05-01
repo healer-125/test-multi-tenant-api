@@ -1,0 +1,113 @@
+# -----------------------------------------------------------------------
+# .NET build outputs
+# -----------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Ll]og/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Publish output
+publish/
+[Pp]ublish/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+project.lock.json
+project.fragment.lock.json
+artifacts/
+packages/
+!**/[Pp]ackages/build/
+
+# NuGet package restore stamps
+*.nuget.props
+*.nuget.targets
+
+# MSBuild / Roslyn
+*.pidb
+*.polydata
+*.ide
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.vspscc
+*.vssscc
+
+# -----------------------------------------------------------------------
+# SQLite runtime databases (auto-created by the seeder at start-up)
+# Keep the data/ directory itself tracked via .gitkeep
+# -----------------------------------------------------------------------
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# -----------------------------------------------------------------------
+# Log files
+# -----------------------------------------------------------------------
+logs/*.log
+*.log
+
+# -----------------------------------------------------------------------
+# Secrets / environment
+# -----------------------------------------------------------------------
+.env
+.env.*
+**/secrets.json
+**/appsettings.*.json
+# Re-include the committed settings files
+!**/appsettings.json
+!**/appsettings.Development.json
+
+# -----------------------------------------------------------------------
+# Visual Studio / Rider / VS Code
+# -----------------------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+*.DS_Store
+Thumbs.db
+*.rsuser
+*.MVC.user
+*.DotSettings.user
+
+# -----------------------------------------------------------------------
+# dotnet tool manifests & test results
+# -----------------------------------------------------------------------
+.dotnet/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+
+# -----------------------------------------------------------------------
+# Rider
+# -----------------------------------------------------------------------
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
+
+# -----------------------------------------------------------------------
+# Watch output (dotnet watch)
+# -----------------------------------------------------------------------
+.sass-cache/

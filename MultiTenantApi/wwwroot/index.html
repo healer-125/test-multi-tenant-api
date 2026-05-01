@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Tenant Data Explorer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+    header span { opacity: .6; font-size: .85rem; }
+
+    .toolbar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: .75rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: flex-end;
+    }
+
+    .field { display: flex; flex-direction: column; gap: .25rem; }
+    .field label { font-size: .75rem; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+
+    select, input[type=number] {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: .45rem .75rem;
+      font-size: .9rem;
+      background: #fff;
+      min-width: 160px;
+    }
+    select:focus, input:focus { outline: 2px solid #4f8ef7; border-color: #4f8ef7; }
+
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .9rem;
+      padding-bottom: .1rem;
+      cursor: pointer;
+    }
+
+    button {
+      padding: .5rem 1.1rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: .9rem;
+      font-weight: 600;
+      transition: filter .15s;
+    }
+    button:hover { filter: brightness(0.92); }
+    button:active { filter: brightness(0.85); }
+
+    .btn-primary  { background: #4f8ef7; color: #fff; }
+    .btn-export   { background: #22c55e; color: #fff; }
+    .btn-excel    { background: #16a34a; color: #fff; }
+    .btn-nav      { background: #e5e7eb; color: #111; min-width: 2.5rem; }
+    .btn-nav:disabled { opacity: .4; cursor: not-allowed; filter: none; }
+
+    .main { padding: 1.5rem 2rem; }
+
+    .status-bar {
+      font-size: .82rem;
+      color: #555;
+      margin-bottom: .75rem;
+      min-height: 1.2rem;
+    }
+
+    .table-wrapper {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      overflow-x: auto;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+
+    thead th {
+      background: #1a1a2e;
+      color: #fff;
+      padding: .75rem 1rem;
+      text-align: left;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+    thead th .type-badge {
+      display: inline-block;
+      margin-left: .4rem;
+      font-size: .65rem;
+      background: rgba(255,255,255,.2);
+      padding: .1rem .35rem;
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eef2ff; }
+    tbody td { padding: .6rem 1rem; white-space: nowrap; }
+
+    .td-integer, .td-decimal { text-align: right; font-variant-numeric: tabular-nums; }
+    .td-datetime { color: #6366f1; }
+    .td-boolean  { font-weight: 600; }
+    .td-boolean.true  { color: #16a34a; }
+    .td-boolean.false { color: #dc2626; }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      justify-content: center;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .page-info { font-size: .85rem; color: #555; }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #888;
+    }
+    .empty-state .icon { font-size: 3rem; margin-bottom: .5rem; }
+
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: #555;
+    }
+    .loader.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗄 Multi-Tenant Data Explorer</h1>
+  <span>Dynamic query API demo</span>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <div class="field">
+    <label>Tenant</label>
+    <select id="tenantSel" onchange="onTenantChange()">
+      <option value="">— select tenant —</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Table</label>
+    <select id="tableSel" onchange="onTableChange()" disabled>
+      <option value="">— select table —</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Page size</label>
+    <input type="number" id="pageSizeInput" value="10" min="1" max="500" style="width:90px" />
+  </div>
+
+  <label class="checkbox-field">
+    <input type="checkbox" id="expandFkCheck" /> Expand foreign keys
+  </label>
+
+  <button class="btn-primary" onclick="loadPage(1)">Load</button>
+
+  <button class="btn-export" id="btnCsv" onclick="doExport('csv')" disabled>⬇ CSV</button>
+  <button class="btn-excel" id="btnExcel" onclick="doExport('excel')" disabled>⬇ Excel</button>
+</div>
+
+<div class="main">
+  <div class="status-bar" id="statusBar">Select a tenant and table to get started.</div>
+  <div class="loader" id="loader">Loading…</div>
+  <div class="table-wrapper" id="tableWrapper">
+    <div class="empty-state"><div class="icon">📋</div><p>No data loaded yet.</p></div>
+  </div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<script>
+  const BASE = '';   // same origin
+  let state = { page: 1, totalPages: 0, tenant: '', table: '' };
+
+  // ----------------------------------------------------------------- init
+  async function init() {
+    try {
+      const tenants = await fetchJson(`${BASE}/api/tenants`);
+      const sel = document.getElementById('tenantSel');
+      tenants.forEach(t => sel.add(new Option(t.Name, t.Id)));
+    } catch (e) {
+      setStatus('⚠ Could not load tenants: ' + e.message);
+    }
+  }
+
+  // ----------------------------------------------------------------- tenant change
+  async function onTenantChange() {
+    const tenant = document.getElementById('tenantSel').value;
+    const tableSel = document.getElementById('tableSel');
+    tableSel.disabled = true;
+    tableSel.innerHTML = '<option value="">— loading —</option>';
+    clearTable();
+    document.getElementById('btnCsv').disabled = true;
+    document.getElementById('btnExcel').disabled = true;
+
+    if (!tenant) { tableSel.innerHTML = '<option value="">— select table —</option>'; return; }
+
+    try {
+      const tables = await fetchJson(`${BASE}/${tenant}/tables`);
+      tableSel.innerHTML = '<option value="">— select table —</option>';
+      tables.forEach(t => tableSel.add(new Option(t, t)));
+      tableSel.disabled = false;
+      state.tenant = tenant;
+    } catch (e) {
+      setStatus('⚠ Could not load tables: ' + e.message);
+    }
+  }
+
+  // ----------------------------------------------------------------- table change
+  function onTableChange() {
+    const table = document.getElementById('tableSel').value;
+    state.table = table;
+    if (table) loadPage(1);
+  }
+
+  // ----------------------------------------------------------------- load page
+  async function loadPage(page) {
+    const tenant   = document.getElementById('tenantSel').value;
+    const table    = document.getElementById('tableSel').value;
+    const pageSize = parseInt(document.getElementById('pageSizeInput').value) || 10;
+    const expandFk = document.getElementById('expandFkCheck').checked;
+
+    if (!tenant || !table) { setStatus('Please select a tenant and a table.'); return; }
+
+    setLoading(true);
+    try {
+      const url = `${BASE}/${tenant}/data/${encodeURIComponent(table)}?page=${page}&pageSize=${pageSize}&expandForeignKeys=${expandFk}`;
+      const data = await fetchJson(url);
+
+      state = { page: data.Pagination.Page, totalPages: data.Pagination.TotalPages, tenant, table };
+      renderTable(data);
+      renderPagination(data.Pagination);
+      document.getElementById('btnCsv').disabled   = false;
+      document.getElementById('btnExcel').disabled  = false;
+      setStatus(`Showing rows ${(page-1)*pageSize + 1}–${Math.min(page*pageSize, data.Pagination.TotalRows)} of ${data.Pagination.TotalRows} total`);
+    } catch (e) {
+      setStatus('⚠ Error: ' + e.message);
+      clearTable();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ----------------------------------------------------------------- render table
+  function renderTable(data) {
+    const { Columns, Rows } = data;
+
+    if (!Rows || Rows.length === 0) {
+      document.getElementById('tableWrapper').innerHTML =
+        '<div class="empty-state"><div class="icon">📭</div><p>No rows found.</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr>';
+    Columns.forEach(col => {
+      html += `<th>${esc(col.Label)}<span class="type-badge">${esc(col.DataType)}</span></th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    Rows.forEach(row => {
+      html += '<tr>';
+      row.forEach((val, i) => {
+        const dt = Columns[i]?.DataType ?? 'String';
+        html += renderCell(val, dt);
+      });
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('tableWrapper').innerHTML = html;
+  }
+
+  function renderCell(val, dataType) {
+    if (val === null || val === undefined) return `<td class="td-${dataType.toLowerCase()}"><em style="color:#aaa">null</em></td>`;
+
+    const dt = dataType.toLowerCase();
+    let display = String(val);
+
+    if (dt === 'decimal') {
+      const n = parseFloat(val);
+      if (!isNaN(n)) display = n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+    } else if (dt === 'integer') {
+      const n = parseInt(val);
+      if (!isNaN(n)) display = n.toLocaleString();
+    } else if (dt === 'datetime') {
+      // Try to format as a readable date
+      const d = new Date(val);
+      if (!isNaN(d)) display = d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+    } else if (dt === 'boolean') {
+      const boolDisplay = (val === true || val === 'true' || val === 1 || val === '1') ? 'Yes' : 'No';
+      const boolClass   = boolDisplay === 'Yes' ? 'true' : 'false';
+      return `<td class="td-boolean ${boolClass}">${boolDisplay}</td>`;
+    }
+
+    return `<td class="td-${dt}">${esc(display)}</td>`;
+  }
+
+  // ----------------------------------------------------------------- pagination
+  function renderPagination(pag) {
+    const el = document.getElementById('pagination');
+    if (pag.TotalPages <= 1) { el.innerHTML = ''; return; }
+
+    el.innerHTML = `
+      <button class="btn-nav" onclick="loadPage(1)" ${pag.Page <= 1 ? 'disabled' : ''}>⏮</button>
+      <button class="btn-nav" onclick="loadPage(${pag.Page - 1})" ${pag.Page <= 1 ? 'disabled' : ''}>◀</button>
+      <span class="page-info">Page ${pag.Page} of ${pag.TotalPages}</span>
+      <button class="btn-nav" onclick="loadPage(${pag.Page + 1})" ${pag.Page >= pag.TotalPages ? 'disabled' : ''}>▶</button>
+      <button class="btn-nav" onclick="loadPage(${pag.TotalPages})" ${pag.Page >= pag.TotalPages ? 'disabled' : ''}>⏭</button>
+    `;
+  }
+
+  // ----------------------------------------------------------------- export
+  function doExport(format) {
+    const tenant   = document.getElementById('tenantSel').value;
+    const table    = document.getElementById('tableSel').value;
+    if (!tenant || !table) return;
+    const url = `${BASE}/${tenant}/data/${encodeURIComponent(table)}/export/${format}`;
+    window.location.href = url;
+  }
+
+  // ----------------------------------------------------------------- helpers
+  async function fetchJson(url) {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.message || `HTTP ${res.status}`);
+    }
+    return res.json();
+  }
+
+  function clearTable() {
+    document.getElementById('tableWrapper').innerHTML =
+      '<div class="empty-state"><div class="icon">📋</div><p>No data loaded yet.</p></div>';
+    document.getElementById('pagination').innerHTML = '';
+  }
+
+  function setStatus(msg) { document.getElementById('statusBar').textContent = msg; }
+  function setLoading(v)  {
+    document.getElementById('loader').classList.toggle('visible', v);
+    if (v) document.getElementById('tableWrapper').innerHTML = '';
+  }
+
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  init();
+</script>
+</body>
+</html>
